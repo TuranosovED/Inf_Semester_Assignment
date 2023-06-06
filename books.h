@@ -4,6 +4,7 @@
 
 #include "hashfunction.h"
 #include "filesworking.h"
+#include "Fields.h"
 #include "defines.h"
 
 typedef struct Books
@@ -21,7 +22,7 @@ typedef struct BooksDataBase
     struct BooksDataBase *next;
 }BooksDataBase;
 
-void FillStructBooks(Books *book, int structId, char *s);
+void FillStructBooks(Books *book, char *Field, char *s);
 void PrintBook(Books Field);
 BooksDataBase **InitDataBaseBooks(int capacity);
 void RefreshHashtableBook(BooksDataBase *** HashTable,int capacity);

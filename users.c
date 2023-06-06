@@ -1,7 +1,17 @@
 #include "users.h"
 
-void FillStructUsers(Users *user, int structId, char *s) //Заполнение определенного поля структуры
+void FillStructUsers(Users *user,  char *Field, char *s) //Заполнение определенного поля структуры
 {
+    int structId;
+    if(CompareStr(Field,"UserName"))
+        structId = 0;
+    else if(CompareStr(Field,"Password"))
+        structId = 1;
+    else if(CompareStr(Field,"StudentBaseAccess"))
+        structId = 2;
+    else if(CompareStr(Field,"BooksBaseAccess"))
+        structId = 3;
+
     switch (structId)
     {
     case 0:
@@ -72,22 +82,24 @@ void PrintHashTableUsers(UsersDataBase **HashTable, int capacity) //Вывод �
 
 int ReadCsvUsers(UsersDataBase **HashTable, int capacity,char*FileName) //Считывание csv
 {
+    int size = 0;
     int structCounter = 0;
     char sign;
-    char *str = (char *)calloc(1,sizeof(char));
-    int trigger;
-
-    FILE *f;
-    if(FileName == NULL)
+    char* str = (char*)calloc(1, sizeof(char));
+    int trigger = 0;
+    char prev;
+    FILE* f;
+    if (FileName == NULL)
         f = fopen("users.csv", "r");
-    else 
-        f = fopen(FileName,"r");
+    else
+        f = fopen(FileName, "r");
 
-    if(f == NULL)
+    if (f == NULL)
     {
         puts("File is not founded!");
         return 0;
     }
+    char **Fields = MakeTableFieldsMass(f,&size);
     
     Users bufferUser;
     while (1)
@@ -96,33 +108,56 @@ int ReadCsvUsers(UsersDataBase **HashTable, int capacity,char*FileName) //Счи
         switch (sign)
         {
         case ';':
-            FillStructUsers(&bufferUser, structCounter++, str);
-            RefreshStr(&str);
+            if (prev == '"')
+            {
+                trigger = 0;
+                PopLine(&str);
+            }
+            if (!trigger)
+            {
+                FillStructUsers(&bufferUser, Fields[structCounter++], str);
+                RefreshStr(&str);
+            }
+            else
+            {
+                PushLine(&str, sign);
+            }
             break;
         case '\n':
-            FillStructUsers(&bufferUser, structCounter++, str);
+            if (prev == '"')
+            {
+                trigger = 0;
+                PopLine(&str);
+            }
+            FillStructUsers(&bufferUser, Fields[structCounter++], str);
             PushHashTableUsers(HashTable, capacity, bufferUser);
             RefreshStr(&str);
             structCounter = 0;
+            trigger = 0;
             break;
         case '"':
+            if(!trigger)
+                trigger = 1;
+            else
+                PushLine(&str, sign);
             break;
         default:
             if (!feof(f))
                 PushLine(&str, sign);
             break;
         }
-
+        prev = sign;
         if (feof(f))
         {
-            if(str[0] != '\0')
+            if (str[0] != '\0')
             {
-                FillStructUsers(&bufferUser, structCounter++, str);
+                FillStructUsers(&bufferUser, Fields[structCounter++], str);
                 PushHashTableUsers(HashTable, capacity, bufferUser);
             }
             break;
         }
     }
+    FreeFieldMas(&Fields,size);
     fclose(f);
     return 1;
 }

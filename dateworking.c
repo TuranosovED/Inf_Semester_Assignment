@@ -78,7 +78,8 @@ Date ParceDate(char *date) //Парсинг даты
             }
         }
     }
-    year = atoi(buffer); 
+    year = atoi(buffer);
+    free(buffer); //Проверить тестом на память 
     return (Date){day,mounth,year};
 }
 

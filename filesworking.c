@@ -2,7 +2,6 @@
 
 char * MakeBackupFileName(int mode) //Создание строки определенного вида для бэкапа
 {
-
     char *FileName = (char*)calloc(50,sizeof(char));
     
     if(mode == STUDENT)

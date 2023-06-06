@@ -1,7 +1,21 @@
 #include "student.h"
 
-void FillStructStudent(Students *student, int structId, char *s) //Заполнение определенного поля структуры 
+void FillStructStudent(Students *student,  char *Field, char *s) //Заполнение определенного поля структуры 
 {
+    int structId;
+    if(CompareStr(Field,"ID"))
+        structId = 0;
+    else if(CompareStr(Field,"SecondName"))
+        structId = 1;
+    else if(CompareStr(Field,"FirstName"))
+        structId = 2;
+    else if(CompareStr(Field,"ThirdName"))
+        structId = 3;
+    else if(CompareStr(Field,"Faculty"))
+        structId = 4;
+    else if(CompareStr(Field,"Speciality"))
+        structId = 5;
+
     switch (structId)
     {
     case 0:
@@ -60,6 +74,7 @@ int  PushHashTableStudent(StudentsDataBase **HashTable, int capacity, Students v
         {
             head->student = newValue->student;
             puts("The field has been updated");
+            system("pause");
             return 0;
         }
     newValue->next = HashTable[key];
@@ -82,6 +97,7 @@ void PrintHashTableStudent(StudentsDataBase **HashTable, int capacity) //Выв�
 
 int ReadCsvStudent(StudentsDataBase **HashTable, int capacity,char*FileName) //Считывание csv
 {
+    int size = 0;
     int structCounter = 0;
     char sign;
     char* str = (char*)calloc(1, sizeof(char));
@@ -98,7 +114,7 @@ int ReadCsvStudent(StudentsDataBase **HashTable, int capacity,char*FileName) //�
         puts("File is not founded!");
         return 0;
     }
-
+    char **Fields = MakeTableFieldsMass(f,&size);
     Students bufferStudent;
     while (1)
     {
@@ -113,7 +129,7 @@ int ReadCsvStudent(StudentsDataBase **HashTable, int capacity,char*FileName) //�
             }
             if (!trigger)
             {
-                FillStructStudent(&bufferStudent, structCounter++, str);
+                FillStructStudent(&bufferStudent, Fields[structCounter++], str);
                 RefreshStr(&str);
             }
             else
@@ -127,7 +143,7 @@ int ReadCsvStudent(StudentsDataBase **HashTable, int capacity,char*FileName) //�
                 trigger = 0;
                 PopLine(&str);
             }
-            FillStructStudent(&bufferStudent, structCounter++, str);
+            FillStructStudent(&bufferStudent, Fields[structCounter++], str);
             PushHashTableStudent(HashTable, capacity, bufferStudent);
             RefreshStr(&str);
             structCounter = 0;
@@ -149,12 +165,13 @@ int ReadCsvStudent(StudentsDataBase **HashTable, int capacity,char*FileName) //�
         {
             if (str[0] != '\0')
             {
-                FillStructStudent(&bufferStudent, structCounter++, str);
+                FillStructStudent(&bufferStudent, Fields[structCounter++], str);
                 PushHashTableStudent(HashTable, capacity, bufferStudent);
             }
             break;
         }
     }
+    FreeFieldMas(&Fields,size);
     fclose(f);
     return 1;
 }
@@ -244,6 +261,15 @@ int FindById(StudentsDataBase** HashTable,int capacity,char *value) //Поиск
 
 void RefreshHashtableStudent(StudentsDataBase *** HashTable,int capacity) //Переинициализация таблицы
 {
+    StudentsDataBase *prev;
+    for(int i =0;i<capacity;i++)
+    {
+        for(StudentsDataBase *head = (*HashTable)[i];head !=NULL;head = prev)
+        {
+            prev = head->next;
+            free(head);
+        }
+    }
     free(*HashTable);
     *HashTable = InitDataBaseStudent(capacity);
 }

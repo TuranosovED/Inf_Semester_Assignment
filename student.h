@@ -6,6 +6,7 @@
 
 #include "lines.h"
 #include "filesworking.h"
+#include "Fields.h"
 #include "defines.h"
 
 typedef struct Students
@@ -24,7 +25,7 @@ typedef struct StudentsDataBase
     struct StudentsDataBase *next;
 }StudentsDataBase;
 
-void FillStructStudent(Students *student, int structId, char *s);
+void FillStructStudent(Students *student,  char *Field, char *s);
 void PrintStudent(Students Field);
 StudentsDataBase **InitDataBaseStudent(int capacity);
 int  PushHashTableStudent(StudentsDataBase **HashTable, int capacity, Students value);

@@ -1,7 +1,19 @@
 #include "books.h"
 
-void FillStructBooks(Books *book, int structId, char *s) //Заполнение структуры по номеру поля
+void FillStructBooks(Books *book, char *Field, char *s) //Заполнение структуры по номеру поля
 {
+    int structId;
+    if(CompareStr(Field,"ISBN"))
+        structId = 0;
+    else if(CompareStr(Field,"Initials"))
+        structId = 1;
+    else if(CompareStr(Field,"BookName"))
+        structId = 2;
+    else if(CompareStr(Field,"BookCount"))
+        structId = 3;
+    else if(CompareStr(Field,"FreeBooks"))
+        structId = 4;
+
     switch (structId)
     {
     case 0:
@@ -43,6 +55,15 @@ BooksDataBase **InitDataBaseBooks(int capacity) //Инициализация т�
 
 void RefreshHashtableBook(BooksDataBase *** HashTable,int capacity) //Переинициализация таблицы
 {
+    BooksDataBase *prev;
+    for(int i =0;i<capacity;i++)
+    {
+        for(BooksDataBase *head = (*HashTable)[i];head !=NULL;head = prev)
+        {
+            prev = head->next;
+            free(head);
+        }
+    }
     free(*HashTable);
     *HashTable = InitDataBaseBooks(capacity);
 }
@@ -60,6 +81,7 @@ int PushHashTableBooks(BooksDataBase **HashTable, int capacity, Books value) //�
         if (CompareStr(head->book.ISBN, value.ISBN))
         {
             head->book = newValue->book;
+            free(newValue);    //Проверить тестом на память
             puts("The field has been updated!");
             return 0;
         }
@@ -95,6 +117,7 @@ void SortHashTableBookByISBN(BooksDataBase **HashTable, int capacity) //Сорт
         
     for(int i =0;i<count;i++)
         PrintBook(bufferArray[i]);
+    free(bufferArray);
 }
 
 void PrintHashTableBook(BooksDataBase **HashTable, int capacity) //Вывод таблицы в консоль
@@ -112,13 +135,14 @@ void PrintHashTableBook(BooksDataBase **HashTable, int capacity) //Вывод т
 
 int ReadCsvBook(BooksDataBase **HashTable, int capacity,char*FileName) //Считывание csv
 {
+    int size = 0;
     int structCounter = 0;
     char sign;
     char* str = (char*)calloc(1, sizeof(char));
     int trigger = 0;
     char prev;
     FILE* f;
-
+    
     if(FileName == NULL)
     {
         f = fopen("books.csv", "r");
@@ -131,7 +155,7 @@ int ReadCsvBook(BooksDataBase **HashTable, int capacity,char*FileName) //Счи�
         puts("File is not founded!");
         return 0;
     }
-    
+    char **Fields = MakeTableFieldsMass(f,&size);
     Books bufferBook;
 
     while (1)
@@ -147,7 +171,7 @@ int ReadCsvBook(BooksDataBase **HashTable, int capacity,char*FileName) //Счи�
             }
             if (!trigger)
             {
-                FillStructBooks(&bufferBook, structCounter++, str);
+                FillStructBooks(&bufferBook, Fields[structCounter++], str);
                 RefreshStr(&str);
             }
             else
@@ -161,7 +185,7 @@ int ReadCsvBook(BooksDataBase **HashTable, int capacity,char*FileName) //Счи�
                 trigger = 0;
                 PopLine(&str);
             }
-            FillStructBooks(&bufferBook, structCounter++, str);
+            FillStructBooks(&bufferBook, Fields[structCounter++], str);
             PushHashTableBooks(HashTable, capacity, bufferBook);
             RefreshStr(&str);
             structCounter = 0;
@@ -183,12 +207,13 @@ int ReadCsvBook(BooksDataBase **HashTable, int capacity,char*FileName) //Счи�
         {
             if (str[0] != '\0')
             {
-                FillStructBooks(&bufferBook, structCounter++, str);
+                FillStructBooks(&bufferBook, Fields[structCounter++], str);
                 PushHashTableBooks(HashTable, capacity, bufferBook);
             }
             break;
         }
     }
+    FreeFieldMas(&Fields,size);
     fclose(f);
     return 1;
 }
@@ -226,6 +251,7 @@ int BackupBook(BooksDataBase ** HashTable,int capacity) //Создание бэ�
             fprintf(f,"%s;%s;%s;%d;%d\n",head->book.ISBN,head->book.Initials,head->book.BookName,head->book.BookCount,head->book.FreeBooks);
         }
     }
+    free(s); //Проверить тестом на память
     fclose(f);
     return 1;
 }

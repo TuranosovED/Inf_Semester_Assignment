@@ -1,7 +1,15 @@
 #include "borrowers.h"
 
-void FillStructBorrower(Borrowers *borrower, int structId, char *s) //Заполнение структуры по номеру поля
+void FillStructBorrower(Borrowers *borrower,  char *Field, char *s) //Заполнение структуры по номеру поля
 {
+    int structId;
+    if(CompareStr(Field,"ISBN"))
+        structId = 0;
+    else if(CompareStr(Field,"ID"))
+        structId = 1;
+    else if(CompareStr(Field,"DATE"))
+        structId = 2;
+
     switch (structId)
     {
     case 0:
@@ -66,22 +74,24 @@ int IsBookBorrow(BorrowersDataBase **HashTable,int capacity,char *value) //Пр�
 
 int ReadCsvBorrowers(BorrowersDataBase **HashTable, int capacity,char*FileName) //Считывание csv
 {
+    int size = 0;
     int structCounter = 0;
     char sign;
-    char *str = (char *)calloc(1,sizeof(char));
-    int trigger;
-
-    FILE *f;
-    if(FileName == NULL)
+    char* str = (char*)calloc(1, sizeof(char));
+    int trigger = 0;
+    char prev;
+    FILE* f;
+    if (FileName == NULL)
         f = fopen("student_books.csv", "r");
-    else 
-        f = fopen(FileName,"r");
+    else
+        f = fopen(FileName, "r");
 
-    if(f == NULL)
+    if (f == NULL)
     {
         puts("File is not founded!");
         return 0;
     }
+    char **Fields = MakeTableFieldsMass(f,&size);
     
     Borrowers bufferBorrower;
     while (1)
@@ -90,33 +100,56 @@ int ReadCsvBorrowers(BorrowersDataBase **HashTable, int capacity,char*FileName) 
         switch (sign)
         {
         case ';':
-            FillStructBorrower(&bufferBorrower, structCounter++, str);
-            RefreshStr(&str);
+            if (prev == '"')
+            {
+                trigger = 0;
+                PopLine(&str);
+            }
+            if (!trigger)
+            {
+                FillStructBorrower(&bufferBorrower, Fields[structCounter++], str);
+                RefreshStr(&str);
+            }
+            else
+            {
+                PushLine(&str, sign);
+            }
             break;
         case '\n':
-            FillStructBorrower(&bufferBorrower, structCounter++, str);
+            if (prev == '"')
+            {
+                trigger = 0;
+                PopLine(&str);
+            }
+            FillStructBorrower(&bufferBorrower, Fields[structCounter++], str);
             PushHashTableBorrower(HashTable, capacity, bufferBorrower);
             RefreshStr(&str);
             structCounter = 0;
+            trigger = 0;
             break;
         case '"':
+            if(!trigger)
+                trigger = 1;
+            else
+                PushLine(&str, sign);
             break;
         default:
             if (!feof(f))
                 PushLine(&str, sign);
             break;
         }
-
+        prev = sign;
         if (feof(f))
         {
-            if(str[0] != '\0')
+            if (str[0] != '\0')
             {
-                FillStructBorrower(&bufferBorrower, structCounter++, str);
+                FillStructBorrower(&bufferBorrower, Fields[structCounter++], str);
                 PushHashTableBorrower(HashTable, capacity, bufferBorrower);
             }
             break;
         }
     }
+    FreeFieldMas(&Fields,size);
     fclose(f);
     return 1;
 }

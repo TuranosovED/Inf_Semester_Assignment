@@ -4,6 +4,7 @@
 
 #include "hashfunction.h"
 #include "lines.h"
+#include "Fields.h"
 #include "defines.h"
 
 typedef struct Users
@@ -20,7 +21,7 @@ typedef struct UsersDataBase
     struct UsersDataBase* next;
 }UsersDataBase;
 
-void FillStructUsers(Users *user, int structId, char *s);
+void FillStructUsers(Users *user,  char *Field, char *s);
 void PrintUser(Users Field);
 UsersDataBase **InitDataBaseUsers(int capacity);
 int PushHashTableUsers(UsersDataBase **HashTable, int capacity, Users value);

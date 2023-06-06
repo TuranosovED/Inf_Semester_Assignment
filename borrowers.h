@@ -5,6 +5,7 @@
 
 #include "hashfunction.h"
 #include "lines.h"
+#include "Fields.h"
 #include "defines.h"
 
 typedef struct Borrowers
@@ -20,7 +21,7 @@ typedef struct BorrowersDataBase
     struct BorrowersDataBase *next;
 }BorrowersDataBase;
 
-void FillStructBorrower(Borrowers *borrower, int structId, char *s);
+void FillStructBorrower(Borrowers *borrower,  char *Field, char *s);
 BorrowersDataBase **InitDataBaseBorrowers(int capacity);
 int PushHashTableBorrower(BorrowersDataBase **HashTable, int capacity, Borrowers value);
 void PrintHashTableBorrowers(BorrowersDataBase **HashTable, int capacity);
