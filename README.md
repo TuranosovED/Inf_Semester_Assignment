@@ -8,3 +8,5 @@ GCC: gcc library.c borrowers.c dateworking.c books.c filesworking.c hashfunction
 2. student_books.csv
 3. students.csv
 4. users.csv
+
+Для корректного отображения кириллицы использовать кодировку csv файлов Windows 1251(Windows crlf).
