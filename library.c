@@ -197,7 +197,7 @@ int StudentsBaseMenu(StudentsDataBase ***HashTableStudents,BorrowersDataBase ***
     while (1)
     {
         system("cls");
-        puts("1 - Read students csv file\n2 - Add student in student base\n3 - Find student by second name\n4 - Delete student from student base\n5 - Print student base\n6 - Make student base backup\n7 - Restore student base backup\n8 - View student books\n9 - Сome back");
+        puts("1 - Read students csv file\n2 - Add student in student base\n3 - Find student by second name\n4 - Delete student from student base\n5 - Print student base\n6 - Make student base backup\n7 - Restore student base backup\n8 - View student books\n9 - Come back");
         scanf("%d",&command);
         
         switch (command)
@@ -353,7 +353,7 @@ int BooksBaseMenu(BooksDataBase ***HashTableBooks,BorrowersDataBase ***HashTable
 
 int main()
 {
-    system("chcp 65001");
+    system("chcp 1251");
     MakeDirs(); //создание директорий используемых функциями
     UsersDataBase **HashTableUsers = InitDataBaseUsers(USERS_DATABASE_CAPACITY);
     ReadCsvUsers(HashTableUsers,USERS_DATABASE_CAPACITY,NULL);
