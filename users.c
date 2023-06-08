@@ -100,14 +100,14 @@ int ReadCsvUsers(UsersDataBase **HashTable, int capacity,char*FileName) //Счи
         return 0;
     }
     char **Fields = MakeTableFieldsMass(f,&size);
-    
+
     Users bufferUser;
     while (1)
     {
         sign = fgetc(f);
         switch (sign)
         {
-        case ';':
+        case ',':
             if (prev == '"')
             {
                 trigger = 0;
@@ -129,9 +129,7 @@ int ReadCsvUsers(UsersDataBase **HashTable, int capacity,char*FileName) //Счи
                 trigger = 0;
                 PopLine(&str);
             }
-            FillStructUsers(&bufferUser, Fields[structCounter++], str);
             PushHashTableUsers(HashTable, capacity, bufferUser);
-            RefreshStr(&str);
             structCounter = 0;
             trigger = 0;
             break;
@@ -149,11 +147,8 @@ int ReadCsvUsers(UsersDataBase **HashTable, int capacity,char*FileName) //Счи
         prev = sign;
         if (feof(f))
         {
-            if (str[0] != '\0')
-            {
-                FillStructUsers(&bufferUser, Fields[structCounter++], str);
+            if (str[0] != ',')
                 PushHashTableUsers(HashTable, capacity, bufferUser);
-            }
             break;
         }
     }
@@ -196,5 +191,6 @@ int AccessUser(UsersDataBase** HashTable,int capacity,Users *CurrentUser) //Пр
         puts("Access denied! Wrong Password or Username");
     else
         puts("\nAccess!");
+    system("pause");
     return trigger;
 }

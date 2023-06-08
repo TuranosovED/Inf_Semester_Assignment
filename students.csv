@@ -1,4 +1,4 @@
-ID;SecondName;FirstName;ThirdName;Faculty;Speciality
-1K2342;Ivanov;Ivan;Ivanovich;IU;""Design and production technology of ES""
-1K2355;Turanosov;Eduard;Dmitrievich;IU4;""Design and production technology of ES""
-1K2348;Vasiliev;Denis;Sergeivich;IU5;""Design and production technology of ES""
+ID,SecondName,FirstName,ThirdName,Faculty,Speciality,
+1K2342,Ivanov,Ivan,Ivanovich,IU,""Design and production technology of ES"",
+1K2355,Turanosov,Eduard,Dmitrievich,IU4,""Design and production technology of ES"",
+1K2348,Vasiliev,Denis,Sergeivich,IU5,""Design and production technology of ES"",

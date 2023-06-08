@@ -163,7 +163,7 @@ int ReadCsvBook(BooksDataBase **HashTable, int capacity,char*FileName) //Счи�
         sign = fgetc(f);
         switch (sign)
         {
-        case ';':
+        case ',':
             if (prev == '"')
             {
                 trigger = 0;
@@ -185,9 +185,7 @@ int ReadCsvBook(BooksDataBase **HashTable, int capacity,char*FileName) //Счи�
                 trigger = 0;
                 PopLine(&str);
             }
-            FillStructBooks(&bufferBook, Fields[structCounter++], str);
             PushHashTableBooks(HashTable, capacity, bufferBook);
-            RefreshStr(&str);
             structCounter = 0;
             trigger = 0;
             break;
@@ -205,11 +203,8 @@ int ReadCsvBook(BooksDataBase **HashTable, int capacity,char*FileName) //Счи�
         prev = sign;
         if (feof(f))
         {
-            if (str[0] != '\0')
-            {
-                FillStructBooks(&bufferBook, Fields[structCounter++], str);
+            if (str[0] != ',')
                 PushHashTableBooks(HashTable, capacity, bufferBook);
-            }
             break;
         }
     }
@@ -244,11 +239,15 @@ int BackupBook(BooksDataBase ** HashTable,int capacity) //Создание бэ�
         puts("File is not created!");
         return 0;
     }
+    fprintf(f,"ISBN,Initials,BookName,BookCount,FreeBooks,\n");
     for(int i =0;i<capacity;i++)
     {
         for(BooksDataBase *head = HashTable[i];head!=NULL;head = head->next)
         {
-            fprintf(f,"%s;%s;%s;%d;%d\n",head->book.ISBN,head->book.Initials,head->book.BookName,head->book.BookCount,head->book.FreeBooks);
+            PrintBackUpField(head->book.ISBN,f);
+            PrintBackUpField(head->book.Initials,f);
+            PrintBackUpField(head->book.BookName,f);
+            fprintf(f,"%d,%d,\n",head->book.BookCount,head->book.FreeBooks);
         }
     }
     free(s); //Проверить тестом на память

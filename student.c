@@ -74,7 +74,6 @@ int  PushHashTableStudent(StudentsDataBase **HashTable, int capacity, Students v
         {
             head->student = newValue->student;
             puts("The field has been updated");
-            system("pause");
             return 0;
         }
     newValue->next = HashTable[key];
@@ -121,7 +120,7 @@ int ReadCsvStudent(StudentsDataBase **HashTable, int capacity,char*FileName) //�
         sign = fgetc(f);
         switch (sign)
         {
-        case ';':
+        case ',':
             if (prev == '"')
             {
                 trigger = 0;
@@ -143,9 +142,7 @@ int ReadCsvStudent(StudentsDataBase **HashTable, int capacity,char*FileName) //�
                 trigger = 0;
                 PopLine(&str);
             }
-            FillStructStudent(&bufferStudent, Fields[structCounter++], str);
             PushHashTableStudent(HashTable, capacity, bufferStudent);
-            RefreshStr(&str);
             structCounter = 0;
             trigger = 0;
             break;
@@ -163,11 +160,8 @@ int ReadCsvStudent(StudentsDataBase **HashTable, int capacity,char*FileName) //�
         prev = sign;
         if (feof(f))
         {
-            if (str[0] != '\0')
-            {
-                FillStructStudent(&bufferStudent, Fields[structCounter++], str);
+            if (str[0] != ',')
                 PushHashTableStudent(HashTable, capacity, bufferStudent);
-            }
             break;
         }
     }
@@ -204,11 +198,18 @@ int BackupStudent(StudentsDataBase ** HashTable,int capacity) //Создание
         puts("File is not created!");
         return 0;
     }
+    fprintf(f,"ID,SecondName,FirstName,ThirdName,Faculty,Speciality,\n");
     for(int i =0;i<capacity;i++)
     {
         for(StudentsDataBase *head = HashTable[i];head!=NULL;head = head->next)
         {
-            fprintf(f,"%s;%s;%s;%s;%s;%s\n",head->student.id,head->student.secondName,head->student.firstName,head->student.thirdName,head->student.faculty,head->student.speciality);
+            PrintBackUpField(head->student.id,f);
+            PrintBackUpField(head->student.secondName,f);
+            PrintBackUpField(head->student.firstName,f);
+            PrintBackUpField(head->student.thirdName,f);
+            PrintBackUpField(head->student.faculty,f);
+            PrintBackUpField(head->student.speciality,f);
+            fprintf(f,"\n");
         }
     }
     fclose(f);

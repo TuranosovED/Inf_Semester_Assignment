@@ -99,7 +99,7 @@ int ReadCsvBorrowers(BorrowersDataBase **HashTable, int capacity,char*FileName) 
         sign = fgetc(f);
         switch (sign)
         {
-        case ';':
+        case ',':
             if (prev == '"')
             {
                 trigger = 0;
@@ -121,9 +121,7 @@ int ReadCsvBorrowers(BorrowersDataBase **HashTable, int capacity,char*FileName) 
                 trigger = 0;
                 PopLine(&str);
             }
-            FillStructBorrower(&bufferBorrower, Fields[structCounter++], str);
             PushHashTableBorrower(HashTable, capacity, bufferBorrower);
-            RefreshStr(&str);
             structCounter = 0;
             trigger = 0;
             break;
@@ -141,11 +139,8 @@ int ReadCsvBorrowers(BorrowersDataBase **HashTable, int capacity,char*FileName) 
         prev = sign;
         if (feof(f))
         {
-            if (str[0] != '\0')
-            {
-                FillStructBorrower(&bufferBorrower, Fields[structCounter++], str);
+            if (str[0] != ',')
                 PushHashTableBorrower(HashTable, capacity, bufferBorrower);
-            }
             break;
         }
     }
